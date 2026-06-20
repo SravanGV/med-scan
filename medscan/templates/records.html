@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card">
+  <div class="records-head">
+    <h2>Patient Records</h2>
+    <a class="button-link" href="{{ url_for('main.export_csv') }}">Export CSV</a>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>Date</th><th>Patient</th><th>Modality</th><th>Result</th><th>Confidence</th><th>Report</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in records %}
+      <tr>
+        <td>{{ row['created_at'][:10] }}</td>
+        <td>{{ row['patient_code'] }} - {{ row['full_name'] }}</td>
+        <td>{{ row['modality'] }}</td>
+        <td>{{ row['result_label'] }}</td>
+        <td>{{ '%.2f'|format(row['confidence'] * 100) }}%</td>
+        <td>{{ row['report'] }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="6">No records yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

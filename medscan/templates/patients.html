@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="split">
+  <div class="card">
+    <h2>Register Patient</h2>
+    <form method="post" class="form-grid">
+      <label>Patient Code <input name="patient_code" required /></label>
+      <label>Full Name <input name="full_name" required /></label>
+      <label>Age <input type="number" min="1" name="age" required /></label>
+      <label>Gender
+        <select name="gender" required>
+          <option value="">Select</option>
+          <option>Male</option>
+          <option>Female</option>
+          <option>Other</option>
+        </select>
+      </label>
+      <label>Contact <input name="contact" /></label>
+      <button type="submit">Save Patient</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <h2>Patient List</h2>
+    <form method="get" class="search-bar">
+      <input name="q" placeholder="Search patient/code" value="{{ search }}" />
+      <button type="submit">Search</button>
+    </form>
+    <table>
+      <thead><tr><th>Code</th><th>Name</th><th>Age</th><th>Gender</th></tr></thead>
+      <tbody>
+        {% for row in patients %}
+        <tr><td>{{ row['patient_code'] }}</td><td>{{ row['full_name'] }}</td><td>{{ row['age'] }}</td><td>{{ row['gender'] }}</td></tr>
+        {% else %}
+        <tr><td colspan="4">No patients found.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
