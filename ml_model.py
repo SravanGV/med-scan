@@ -11,6 +11,7 @@ WEIGHT_TRANSITION = 1.5
 WEIGHT_HIGH_INTENSITY = 0.8
 WEIGHT_CENTER_INTENSITY = 0.3
 STD_NORMALIZATION = 127.5
+INTENSITY_MIDPOINT = 127.5
 
 
 @dataclass(frozen=True)
@@ -51,7 +52,7 @@ def extract_features(image_bytes: bytes) -> Dict[str, float]:
         counts[value] = counts.get(value, 0) + 1
 
     entropy = _entropy(counts, total)
-    center_intensity = 1.0 - (abs(mean - 127.5) / 127.5)
+    center_intensity = 1.0 - (abs(mean - INTENSITY_MIDPOINT) / INTENSITY_MIDPOINT)
 
     return {
         "mean": mean / 255.0,

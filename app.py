@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-import cgi
 import logging
+from email.parser import BytesParser
+from email.policy import default
 from html import escape
 from wsgiref.simple_server import make_server
 
@@ -35,6 +36,25 @@ HTML_PAGE = """<!doctype html>
 LOGGER = logging.getLogger(__name__)
 
 
+def _parse_uploaded_image(environ):
+    content_type = environ.get("CONTENT_TYPE", "")
+    content_length = int(environ.get("CONTENT_LENGTH") or 0)
+    if content_length <= 0 or "multipart/form-data" not in content_type:
+        return None, None
+
+    body = environ["wsgi.input"].read(content_length)
+    message = BytesParser(policy=default).parsebytes(
+        f"Content-Type: {content_type}\r\nMIME-Version: 1.0\r\n\r\n".encode("utf-8") + body
+    )
+
+    for part in message.iter_parts():
+        if part.get_param("name", header="content-disposition") == "image":
+            filename = part.get_filename() or "uploaded-file"
+            payload = part.get_payload(decode=True) or b""
+            return filename, payload
+    return None, None
+
+
 def _result_class(label: str) -> str:
     if label == "tumor_suspected":
         return "alert"
@@ -53,19 +73,12 @@ def application(environ, start_response):
         return [_render_result()]
 
     if environ["REQUEST_METHOD"] == "POST" and environ.get("PATH_INFO", "") == "/scan":
-        form = cgi.FieldStorage(fp=environ["wsgi.input"], environ=environ, keep_blank_values=True)
-
-        if "image" not in form:
+        filename, image_bytes = _parse_uploaded_image(environ)
+        if filename is None:
             start_response("400 Bad Request", [("Content-Type", "text/html; charset=utf-8")])
             return [_render_result("<div class='card alert'>No image uploaded.</div>")]
 
-        file_item = form["image"]
-        if not getattr(file_item, "file", None):
-            start_response("400 Bad Request", [("Content-Type", "text/html; charset=utf-8")])
-            return [_render_result("<div class='card alert'>No image uploaded.</div>")]
-
-        image_bytes = file_item.file.read()
-        filename = escape(getattr(file_item, "filename", "uploaded-file"))
+        filename = escape(filename)
 
         try:
             scan_result = predict_scan(image_bytes)

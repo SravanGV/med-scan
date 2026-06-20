@@ -35,7 +35,7 @@ class MLModelTests(unittest.TestCase):
     def test_predict_scan_flags_high_entropy_pattern(self):
         image_bytes = bytes(range(256)) * 16
         result = predict_scan(image_bytes)
-        self.assertIn(result.label, {"tumor_suspected", "defect_suspected"})
+        self.assertTrue(result.label in ["tumor_suspected", "defect_suspected"])
         self.assertGreaterEqual(result.probability, 0.45)
         self.assertGreaterEqual(result.confidence, 0.45)
         self.assertLessEqual(result.confidence, 1.0)
