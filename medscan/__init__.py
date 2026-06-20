@@ -21,9 +21,6 @@ def create_app(test_config=None):
     os.makedirs(app.instance_path, exist_ok=True)
     os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
 
-    from .db import init_app
-
-    init_app(app)
     app.teardown_appcontext(close_db)
     app.cli.add_command(init_db_command)
 

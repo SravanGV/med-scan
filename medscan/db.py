@@ -104,7 +104,3 @@ def log_activity(event_type, event_message, actor_id=None):
 def init_db_command():
     init_db()
     click.echo("Database initialized.")
-
-
-def init_app(_app):
-    return None

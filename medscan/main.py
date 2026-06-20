@@ -1,3 +1,5 @@
+import csv
+import io
 import os
 import uuid
 from datetime import datetime, timedelta, timezone
@@ -232,7 +234,22 @@ def export_csv():
     ).fetchall()
 
     def generate():
-        yield "created_at,patient_code,patient_name,modality,result_label,confidence,report\n"
+        headers = [
+            "created_at",
+            "patient_code",
+            "patient_name",
+            "modality",
+            "result_label",
+            "confidence",
+            "report",
+        ]
+        buffer = io.StringIO()
+        writer = csv.writer(buffer)
+        writer.writerow(headers)
+        yield buffer.getvalue()
+        buffer.seek(0)
+        buffer.truncate(0)
+
         for row in rows:
             output = [
                 row["created_at"],
@@ -241,9 +258,12 @@ def export_csv():
                 row["modality"],
                 row["result_label"],
                 str(round(row["confidence"], 4)),
-                row["report"].replace(",", ";"),
+                row["report"],
             ]
-            yield ",".join(output) + "\n"
+            writer.writerow(output)
+            yield buffer.getvalue()
+            buffer.seek(0)
+            buffer.truncate(0)
 
     return Response(
         generate(),
