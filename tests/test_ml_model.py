@@ -34,12 +34,15 @@ class MLModelTests(unittest.TestCase):
         result = predict_scan(image_bytes)
         self.assertIn(result.label, {"tumor_suspected", "defect_suspected"})
         self.assertGreaterEqual(result.probability, 0.45)
+        self.assertGreaterEqual(result.confidence, 0.45)
+        self.assertLessEqual(result.confidence, 1.0)
 
     def test_predict_scan_identifies_low_variance_pattern(self):
         image_bytes = bytes([40]) * 2048
         result = predict_scan(image_bytes)
         self.assertEqual(result.label, "no_obvious_defect")
         self.assertLess(result.probability, 0.45)
+        self.assertGreater(result.confidence, 0.55)
 
 
 if __name__ == "__main__":

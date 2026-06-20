@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import cgi
+import logging
 from html import escape
 from wsgiref.simple_server import make_server
 
@@ -31,6 +32,7 @@ HTML_PAGE = """<!doctype html>
 </body>
 </html>
 """
+LOGGER = logging.getLogger(__name__)
 
 
 def _result_class(label: str) -> str:
@@ -83,8 +85,13 @@ def application(environ, start_response):
             start_response("400 Bad Request", [("Content-Type", "text/html; charset=utf-8")])
             return [_render_result("<div class='card alert'>Invalid or empty image file.</div>")]
         except Exception:
+            LOGGER.exception("Image processing failed")
             start_response("500 Internal Server Error", [("Content-Type", "text/html; charset=utf-8")])
-            return [_render_result("<div class='card alert'>Unable to process image right now.</div>")]
+            return [
+                _render_result(
+                    "<div class='card alert'>An error occurred while processing the image. Please try again.</div>"
+                )
+            ]
 
     start_response("404 Not Found", [("Content-Type", "text/plain; charset=utf-8")])
     return [b"Not Found"]

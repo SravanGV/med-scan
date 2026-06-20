@@ -24,7 +24,8 @@ def _entropy(byte_counts: Dict[int, int], total: int) -> float:
     entropy = 0.0
     for count in byte_counts.values():
         probability = count / total
-        entropy -= probability * log2(probability)
+        if probability > 0:
+            entropy -= probability * log2(probability)
     return entropy / 8.0
 
 
