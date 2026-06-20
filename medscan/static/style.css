@@ -76,7 +76,7 @@ body {
 
 .activity { list-style: none; padding: 0; margin: 0; }
 .activity li { display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding: 10px 0; }
-.activity .right { text-align: right; color: #ad2732; }
+.activity .right { text-align: right; color: #7f0f1a; }
 
 .form-grid {
   display: grid;

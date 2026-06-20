@@ -29,7 +29,7 @@ def utc_now_iso():
 
 @bp.route("/")
 def index():
-    if g.get("user") is None:
+    if g.user is None:
         return redirect(url_for("auth.login"))
     return redirect(url_for("main.dashboard"))
 
