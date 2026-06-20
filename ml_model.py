@@ -83,15 +83,15 @@ def predict_scan(image_bytes: bytes) -> ScanResult:
 
     if probability >= 0.65:
         label = "tumor_suspected"
-        message = "High anomaly pattern detected. Please consult a radiologist immediately."
+        message = "Prototype model detected high anomaly patterns. This is not a diagnosis; consult qualified medical professionals."
         confidence = probability
     elif probability >= 0.45:
         label = "defect_suspected"
-        message = "Moderate anomaly pattern detected. Further clinical review is recommended."
+        message = "Prototype model detected moderate anomaly patterns. This is not a diagnosis; seek professional medical review."
         confidence = probability
     else:
         label = "no_obvious_defect"
-        message = "No major anomaly pattern detected by this prototype model."
+        message = "Prototype model found no strong anomaly pattern. This is not a diagnosis."
         confidence = 1.0 - probability
 
     return ScanResult(

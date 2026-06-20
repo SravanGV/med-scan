@@ -24,6 +24,7 @@ HTML_PAGE = """<!doctype html>
 </head>
 <body>
   <h1>Med Scan AI Prototype</h1>
+  <p><strong>Important:</strong> This prototype is not a medical diagnosis tool. Always consult qualified medical professionals.</p>
   <p>Upload a medical image to scan for possible tumor or defect patterns.</p>
   <form action=\"/scan\" method=\"post\" enctype=\"multipart/form-data\">
     <input type=\"file\" name=\"image\" accept=\".png,.jpg,.jpeg,.bmp,.tif,.tiff\" required />
@@ -34,6 +35,7 @@ HTML_PAGE = """<!doctype html>
 </html>
 """
 LOGGER = logging.getLogger(__name__)
+MAX_UPLOAD_BYTES = 10 * 1024 * 1024
 
 
 def _parse_uploaded_image(environ):
@@ -41,6 +43,8 @@ def _parse_uploaded_image(environ):
     content_length = int(environ.get("CONTENT_LENGTH") or 0)
     if content_length <= 0 or "multipart/form-data" not in content_type:
         return None, None
+    if content_length > MAX_UPLOAD_BYTES:
+        raise ValueError("Uploaded file exceeds the 10MB limit.")
 
     body = environ["wsgi.input"].read(content_length)
     message = BytesParser(policy=default).parsebytes(
@@ -73,7 +77,12 @@ def application(environ, start_response):
         return [_render_result()]
 
     if environ["REQUEST_METHOD"] == "POST" and environ.get("PATH_INFO", "") == "/scan":
-        filename, image_bytes = _parse_uploaded_image(environ)
+        try:
+            filename, image_bytes = _parse_uploaded_image(environ)
+        except ValueError:
+            start_response("400 Bad Request", [("Content-Type", "text/html; charset=utf-8")])
+            return [_render_result("<div class='card alert'>Invalid, empty, or oversized image file.</div>")]
+
         if filename is None:
             start_response("400 Bad Request", [("Content-Type", "text/html; charset=utf-8")])
             return [_render_result("<div class='card alert'>No image uploaded.</div>")]
@@ -96,9 +105,9 @@ def application(environ, start_response):
             return [_render_result(result_html)]
         except ValueError:
             start_response("400 Bad Request", [("Content-Type", "text/html; charset=utf-8")])
-            return [_render_result("<div class='card alert'>Invalid or empty image file.</div>")]
+            return [_render_result("<div class='card alert'>Invalid, empty, or oversized image file.</div>")]
         except Exception:
-            LOGGER.exception("Image processing failed")
+            LOGGER.exception("Image processing failed for filename=%s bytes=%d", filename, len(image_bytes))
             start_response("500 Internal Server Error", [("Content-Type", "text/html; charset=utf-8")])
             return [
                 _render_result(

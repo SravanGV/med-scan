@@ -19,4 +19,5 @@ python -m unittest discover -s tests
 ## Notes
 
 - This project uses a simple byte-feature anomaly model as a prototype classifier.
+- Upload limit is 10MB per image.
 - Predictions are **not** a clinical diagnosis.
