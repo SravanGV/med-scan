@@ -79,15 +79,18 @@ def application(environ, start_response):
             )
             start_response("200 OK", [("Content-Type", "text/html; charset=utf-8")])
             return [_render_result(result_html)]
-        except ValueError as error:
+        except ValueError:
             start_response("400 Bad Request", [("Content-Type", "text/html; charset=utf-8")])
-            return [_render_result(f"<div class='card alert'>{escape(str(error))}</div>")]
+            return [_render_result("<div class='card alert'>Invalid or empty image file.</div>")]
+        except Exception:
+            start_response("500 Internal Server Error", [("Content-Type", "text/html; charset=utf-8")])
+            return [_render_result("<div class='card alert'>Unable to process image right now.</div>")]
 
     start_response("404 Not Found", [("Content-Type", "text/plain; charset=utf-8")])
     return [b"Not Found"]
 
 
 if __name__ == "__main__":
-    server = make_server("0.0.0.0", 8000, application)
+    server = make_server("127.0.0.1", 8000, application)
     print("Med Scan AI running at http://127.0.0.1:8000")
     server.serve_forever()

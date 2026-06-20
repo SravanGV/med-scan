@@ -4,6 +4,13 @@ from dataclasses import dataclass
 from math import exp, log2, sqrt
 from typing import Dict
 
+MODEL_BIAS = -1.4
+WEIGHT_STD = 1.8
+WEIGHT_ENTROPY = 2.0
+WEIGHT_TRANSITION = 1.5
+WEIGHT_HIGH_INTENSITY = 0.8
+WEIGHT_CENTER_INTENSITY = 0.3
+
 
 @dataclass(frozen=True)
 class ScanResult:
@@ -16,8 +23,6 @@ class ScanResult:
 def _entropy(byte_counts: Dict[int, int], total: int) -> float:
     entropy = 0.0
     for count in byte_counts.values():
-        if count == 0:
-            continue
         probability = count / total
         entropy -= probability * log2(probability)
     return entropy / 8.0
@@ -64,12 +69,12 @@ def predict_scan(image_bytes: bytes) -> ScanResult:
     features = extract_features(image_bytes)
 
     score = (
-        -1.4
-        + 1.8 * features["std"]
-        + 2.0 * features["entropy"]
-        + 1.5 * features["transition_ratio"]
-        + 0.8 * features["high_intensity_ratio"]
-        + 0.3 * features["center_intensity"]
+        MODEL_BIAS
+        + WEIGHT_STD * features["std"]
+        + WEIGHT_ENTROPY * features["entropy"]
+        + WEIGHT_TRANSITION * features["transition_ratio"]
+        + WEIGHT_HIGH_INTENSITY * features["high_intensity_ratio"]
+        + WEIGHT_CENTER_INTENSITY * features["center_intensity"]
     )
     probability = _sigmoid(score)
 

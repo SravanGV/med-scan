@@ -25,6 +25,9 @@ class MLModelTests(unittest.TestCase):
         for value in features.values():
             self.assertGreaterEqual(value, 0.0)
             self.assertLessEqual(value, 1.0)
+        self.assertAlmostEqual(features["mean"], 0.4078, places=4)
+        self.assertAlmostEqual(features["high_intensity_ratio"], 0.4, places=4)
+        self.assertAlmostEqual(features["transition_ratio"], 0.25, places=4)
 
     def test_predict_scan_flags_high_entropy_pattern(self):
         image_bytes = bytes(range(256)) * 16
