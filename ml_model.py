@@ -10,6 +10,7 @@ WEIGHT_ENTROPY = 2.0
 WEIGHT_TRANSITION = 1.5
 WEIGHT_HIGH_INTENSITY = 0.8
 WEIGHT_CENTER_INTENSITY = 0.3
+STD_NORMALIZATION = 127.5
 
 
 @dataclass(frozen=True)
@@ -54,7 +55,7 @@ def extract_features(image_bytes: bytes) -> Dict[str, float]:
 
     return {
         "mean": mean / 255.0,
-        "std": std / 128.0,
+        "std": std / STD_NORMALIZATION,
         "high_intensity_ratio": high_intensity_ratio,
         "transition_ratio": transition_ratio,
         "entropy": entropy,
