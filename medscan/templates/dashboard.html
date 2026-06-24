@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card">
+  <h2>Dashboard</h2>
+  <div class="stats-grid">
+    <div class="stat"><h3>{{ total_patients }}</h3><p>Total Patients</p></div>
+    <div class="stat"><h3>{{ total_analyses }}</h3><p>Image Analyses</p></div>
+    <div class="stat"><h3>{{ weekly }}</h3><p>This Week</p></div>
+  </div>
+</div>
+
+<div class="card">
+  <h3>Recent Activity</h3>
+  {% if recent %}
+    <ul class="activity">
+      {% for row in recent %}
+      <li>
+        <div>
+          <strong>{{ row['modality'] }} analysis</strong>
+          <small>Patient: {{ row['full_name'] }}</small>
+        </div>
+        <div class="right">
+          <strong>{{ row['result_label'] }}</strong>
+          <small>{{ row['created_at'][:10] }}</small>
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No analysis yet.</p>
+  {% endif %}
+</div>
+{% endblock %}

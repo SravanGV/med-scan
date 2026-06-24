@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card">
+  <h2>Image Analysis</h2>
+  {% if not patients %}
+    <p>Please register a patient first.</p>
+  {% else %}
+  <form method="post" enctype="multipart/form-data" class="form-grid">
+    <label>Patient
+      <select name="patient_id" required>
+        <option value="">Select patient</option>
+        {% for p in patients %}
+          <option value="{{ p['id'] }}">{{ p['patient_code'] }} - {{ p['full_name'] }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>Modality
+      <select name="modality" required>
+        <option value="">Select modality</option>
+        <option>X-ray</option>
+        <option>MRI</option>
+        <option>CT</option>
+      </select>
+    </label>
+    <label>Image File <input type="file" name="scan_file" accept=".png,.jpg,.jpeg,.dcm" required /></label>
+    <button type="submit">Upload & Analyze</button>
+  </form>
+  {% endif %}
+</div>
+{% endblock %}

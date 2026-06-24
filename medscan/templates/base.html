@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>MedScan AI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  </head>
+  <body>
+    <main class="page">
+      <header class="topbar">
+        <h1>MedScan AI - Medical Imaging Platform</h1>
+        {% if g.user %}
+          <p class="user-meta">{{ g.user['username'] }} ({{ g.user['role'] }}) · <a href="{{ url_for('auth.logout') }}">Logout</a></p>
+        {% endif %}
+      </header>
+
+      {% if g.user %}
+      <nav class="tabs">
+        <a href="{{ url_for('main.patients') }}">Register Patient</a>
+        <a href="{{ url_for('main.scans') }}">Image Analysis</a>
+        <a href="{{ url_for('main.records') }}">Patient Records</a>
+        <a href="{{ url_for('main.dashboard') }}">Dashboard</a>
+      </nav>
+      {% endif %}
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <section>
+            {% for category, message in messages %}
+              <div class="flash {{ category }}">{{ message }}</div>
+            {% endfor %}
+          </section>
+        {% endif %}
+      {% endwith %}
+
+      <section class="content">
+        {% block content %}{% endblock %}
+      </section>
+    </main>
+  </body>
+</html>
